@@ -16,7 +16,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
+        return view($request->user()->isAdmin() ? 'profile.admin-edit' : 'profile.edit', [
             'user' => $request->user(),
         ]);
     }
@@ -47,6 +47,12 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        if ($user->orders()->exists()) {
+            return back()->withErrors([
+                'password' => 'Akun yang sudah memiliki riwayat pesanan tidak dapat dihapus.',
+            ], 'userDeletion');
+        }
 
         Auth::logout();
 
