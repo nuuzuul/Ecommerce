@@ -37,3 +37,21 @@
     .admin-table tbody tr { @apply transition hover:bg-amber-50/40; }
     .table-action { @apply whitespace-nowrap rounded-lg px-2 py-1 text-sm font-bold text-amber-700 hover:bg-amber-100; }
 }
+
+@layer components {
+    .icon-action {
+        @apply inline-flex h-10 w-10 items-center justify-center rounded-xl border transition focus:outline-none focus:ring-4;
+    }
+
+    .icon-action-view {
+        @apply border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-300 hover:bg-sky-100 focus:ring-sky-100;
+    }
+
+    .icon-action-edit {
+        @apply border-amber-200 bg-amber-50 text-amber-700 hover:border-amber-300 hover:bg-amber-100 focus:ring-amber-100;
+    }
+
+    .icon-action-delete {
+        @apply border-red-200 bg-red-50 text-red-600 hover:border-red-300 hover:bg-red-100 focus:ring-red-100;
+    }
+}

@@ -1,8 +1,163 @@
 @extends('layouts.admin')
-@section('title','Produk — Admin Kanrejawataa')
-@section('page-title','Kelola Produk')
+
+@section('title', 'Produk — Admin Kanrejawataa')
+@section('page-title', 'Kelola Produk')
+
 @section('content')
-<div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="text-2xl font-black">Daftar produk</h2><p class="text-sm text-stone-500">Kelola informasi, harga, ukuran, stok, dan foto produk.</p></div><a href="{{ route('admin.products.create') }}" class="btn-primary">+ Tambah produk</a></div>
-<form class="mt-5 grid gap-3 rounded-2xl border border-stone-200 bg-white p-4 md:grid-cols-[1fr_220px_180px_auto]"><input name="search" value="{{ request('search') }}" class="form-input" placeholder="Cari nama produk"><select name="category" class="form-input"><option value="">Semua kategori</option>@foreach($categories as $category)<option value="{{ $category->id }}" @selected((string)request('category')===(string)$category->id)>{{ $category->name }}</option>@endforeach</select><select name="stock" class="form-input"><option value="">Semua stok</option><option value="low" @selected(request('stock')==='low')>Stok menipis</option><option value="out" @selected(request('stock')==='out')>Stok habis</option></select><button class="btn-primary">Filter</button></form>
-<div class="mt-6 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm"><div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Produk</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Status</th><th>Aksi</th></tr></thead><tbody>@forelse($products as $product)<tr><td><div class="flex items-center gap-3"><img src="{{ $product->image_url }}" class="h-12 w-12 rounded-xl object-cover"><div><b>{{ $product->name }}</b>@if($product->is_featured)<p class="text-xs font-bold text-amber-700">Unggulan</p>@endif</div></div></td><td>{{ $product->category->name }}</td><td>Rp {{ number_format($product->minimum_price,0,',','.') }}@if($product->variants->count()>1)<small class="block text-stone-500">mulai dari</small>@endif</td><td>{{ $product->total_stock }}</td><td><span class="{{ $product->is_active ? 'text-emerald-600':'text-red-600' }} font-bold">{{ $product->is_active ? 'Aktif':'Nonaktif' }}</span></td><td><div class="flex gap-2"><a href="{{ route('admin.products.show',$product) }}" class="table-action">Lihat</a><a href="{{ route('admin.products.edit',$product) }}" class="table-action">Edit</a><form method="POST" action="{{ route('admin.products.destroy',$product) }}" onsubmit="return confirm('Hapus/nonaktifkan produk ini?')">@csrf @method('DELETE')<button class="table-action text-red-600">Hapus</button></form></div></td></tr>@empty<tr><td colspan="6" class="text-center text-stone-500">Belum ada produk.</td></tr>@endforelse</tbody></table></div></div><div class="mt-5">{{ $products->links() }}</div>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h2 class="text-2xl font-black">Daftar produk</h2>
+            <p class="text-sm text-stone-500">
+                Kelola informasi, harga, ukuran, stok, dan foto produk.
+            </p>
+        </div>
+
+        <a href="{{ route('admin.products.create') }}" class="btn-primary gap-2">
+            <x-icon name="plus" />
+            <span>Tambah produk</span>
+        </a>
+    </div>
+
+    <form
+        method="GET"
+        class="mt-5 grid gap-3 rounded-2xl border border-stone-200 bg-white p-4 md:grid-cols-[minmax(0,1fr)_220px_180px_auto]"
+    >
+        <input
+            name="search"
+            value="{{ request('search') }}"
+            class="form-input"
+            placeholder="Cari nama produk"
+        >
+
+        <select name="category" class="form-input">
+            <option value="">Semua kategori</option>
+            @foreach ($categories as $category)
+                <option
+                    value="{{ $category->id }}"
+                    @selected((string) request('category') === (string) $category->id)
+                >
+                    {{ $category->name }}
+                </option>
+            @endforeach
+        </select>
+
+        <select name="stock" class="form-input">
+            <option value="">Semua stok</option>
+            <option value="low" @selected(request('stock') === 'low')>
+                Stok menipis
+            </option>
+            <option value="out" @selected(request('stock') === 'out')>
+                Stok habis
+            </option>
+        </select>
+
+        <button class="btn-primary gap-2">
+            <x-icon name="search" />
+            <span>Filter</span>
+        </button>
+    </form>
+
+    <div class="mt-6 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Produk</th>
+                        <th>Kategori</th>
+                        <th>Harga</th>
+                        <th>Stok</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($products as $product)
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <img
+                                        src="{{ $product->image_url }}"
+                                        alt="{{ $product->name }}"
+                                        class="h-12 w-12 rounded-xl object-cover"
+                                    >
+                                    <div>
+                                        <b>{{ $product->name }}</b>
+                                        @if ($product->is_featured)
+                                            <p class="text-xs font-bold text-amber-700">
+                                                Unggulan
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ $product->category->name }}</td>
+                            <td>
+                                Rp {{ number_format($product->minimum_price, 0, ',', '.') }}
+                                @if ($product->variants->count() > 1)
+                                    <small class="block text-stone-500">mulai dari</small>
+                                @endif
+                            </td>
+                            <td>{{ $product->total_stock }}</td>
+                            <td>
+                                <span class="font-bold {{ $product->is_active
+                                    ? 'text-emerald-600'
+                                    : 'text-red-600' }}">
+                                    {{ $product->is_active ? 'Aktif' : 'Nonaktif' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <a
+                                        href="{{ route('admin.products.show', $product) }}"
+                                        class="icon-action icon-action-view"
+                                        title="Lihat produk"
+                                        aria-label="Lihat produk"
+                                    >
+                                        <x-icon name="eye" />
+                                    </a>
+
+                                    <a
+                                        href="{{ route('admin.products.edit', $product) }}"
+                                        class="icon-action icon-action-edit"
+                                        title="Edit produk"
+                                        aria-label="Edit produk"
+                                    >
+                                        <x-icon name="edit" />
+                                    </a>
+
+                                    <form
+                                        method="POST"
+                                        action="{{ route('admin.products.destroy', $product) }}"
+                                        onsubmit="return confirm('Hapus/nonaktifkan produk ini?')"
+                                    >
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button
+                                            type="submit"
+                                            class="icon-action icon-action-delete"
+                                            title="Hapus produk"
+                                            aria-label="Hapus produk"
+                                        >
+                                            <x-icon name="trash" />
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-stone-500">
+                                Belum ada produk.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        {{ $products->links() }}
+    </div>
 @endsection

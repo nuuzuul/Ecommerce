@@ -1,7 +1,99 @@
 @extends('layouts.admin')
-@section('title','Kategori — Admin Kanrejawataa')
-@section('page-title','Kelola Kategori')
+
+@section('title', 'Kategori — Admin Kanrejawataa')
+@section('page-title', 'Kelola Kategori')
+
 @section('content')
-<div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="text-2xl font-black">Daftar kategori</h2><p class="text-sm text-stone-500">Kategori menentukan apakah produk memakai ukuran atau tidak.</p></div><a href="{{ route('admin.categories.create') }}" class="btn-primary">+ Tambah kategori</a></div>
-<div class="mt-6 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm"><div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Nama</th><th>Tipe ukuran</th><th>Produk</th><th>Status</th><th>Aksi</th></tr></thead><tbody>@forelse($categories as $category)<tr><td><b>{{ $category->name }}</b><p class="text-xs text-stone-500">/{{ $category->slug }}</p></td><td>{{ $category->uses_variants ? '500 gram & 1 kg' : 'Tanpa ukuran' }}</td><td>{{ $category->products_count }}</td><td><span class="{{ $category->is_active ? 'text-emerald-600':'text-red-600' }} font-bold">{{ $category->is_active ? 'Aktif':'Nonaktif' }}</span></td><td><div class="flex gap-2"><a href="{{ route('admin.categories.edit',$category) }}" class="table-action">Edit</a><form method="POST" action="{{ route('admin.categories.destroy',$category) }}" onsubmit="return confirm('Hapus kategori ini?')">@csrf @method('DELETE')<button class="table-action text-red-600">Hapus</button></form></div></td></tr>@empty<tr><td colspan="5" class="text-center text-stone-500">Belum ada kategori.</td></tr>@endforelse</tbody></table></div></div><div class="mt-5">{{ $categories->links() }}</div>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h2 class="text-2xl font-black">Daftar kategori</h2>
+            <p class="text-sm text-stone-500">
+                Kategori menentukan apakah produk memakai ukuran atau tidak.
+            </p>
+        </div>
+
+        <a href="{{ route('admin.categories.create') }}" class="btn-primary gap-2">
+            <x-icon name="plus" />
+            <span>Tambah kategori</span>
+        </a>
+    </div>
+
+    <div class="mt-6 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Tipe ukuran</th>
+                        <th>Produk</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($categories as $category)
+                        <tr>
+                            <td>
+                                <b>{{ $category->name }}</b>
+                                <p class="text-xs text-stone-500">/{{ $category->slug }}</p>
+                            </td>
+                            <td>
+                                {{ $category->uses_variants
+                                    ? '500 gram & 1 kg'
+                                    : 'Tanpa ukuran' }}
+                            </td>
+                            <td>{{ $category->products_count }}</td>
+                            <td>
+                                <span class="font-bold {{ $category->is_active
+                                    ? 'text-emerald-600'
+                                    : 'text-red-600' }}">
+                                    {{ $category->is_active ? 'Aktif' : 'Nonaktif' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <a
+                                        href="{{ route('admin.categories.edit', $category) }}"
+                                        class="icon-action icon-action-edit"
+                                        title="Edit kategori"
+                                        aria-label="Edit kategori"
+                                    >
+                                        <x-icon name="edit" />
+                                    </a>
+
+                                    <form
+                                        method="POST"
+                                        action="{{ route('admin.categories.destroy', $category) }}"
+                                        onsubmit="return confirm('Hapus kategori ini?')"
+                                    >
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button
+                                            type="submit"
+                                            class="icon-action icon-action-delete"
+                                            title="Hapus kategori"
+                                            aria-label="Hapus kategori"
+                                        >
+                                            <x-icon name="trash" />
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center text-stone-500">
+                                Belum ada kategori.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        {{ $categories->links() }}
+    </div>
 @endsection

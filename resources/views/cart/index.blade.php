@@ -10,7 +10,23 @@
                 <div><h2 class="font-black">{{ $item->variant->product->name }}</h2>@if($item->variant->label)<p class="text-sm text-stone-500">{{ $item->variant->label }}</p>@endif<p class="mt-1 font-bold text-amber-700">Rp {{ number_format($item->variant->price,0,',','.') }}</p></div>
                 <div class="flex flex-wrap items-center gap-2 sm:justify-end">
                     <form method="POST" action="{{ route('cart.update',$item) }}" class="flex items-center gap-2">@csrf @method('PATCH')<input type="number" name="quantity" min="1" max="{{ $item->variant->stock }}" value="{{ $item->quantity }}" class="w-20 rounded-xl border-stone-300"><button class="btn-secondary">Ubah</button></form>
-                    <form method="POST" action="{{ route('cart.destroy',$item) }}" onsubmit="return confirm('Hapus produk dari keranjang?')">@csrf @method('DELETE')<button class="rounded-xl px-3 py-2 text-sm font-bold text-red-600 hover:bg-red-50">Hapus</button></form>
+                    <form
+                                        method="POST"
+                                        action="{{ route('cart.destroy', $item) }}"
+                                        onsubmit="return confirm('Hapus produk dari keranjang?')"
+                                    >
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button
+                                            type="submit"
+                                            class="icon-action icon-action-delete"
+                                            title="Hapus dari keranjang"
+                                            aria-label="Hapus dari keranjang"
+                                        >
+                                            <x-icon name="trash" />
+                                        </button>
+                                    </form>
                 </div>
                 <div class="sm:col-start-2 sm:col-span-2 sm:text-right"><span class="text-sm text-stone-500">Subtotal:</span> <b>Rp {{ number_format($item->subtotal,0,',','.') }}</b></div>
             </div>

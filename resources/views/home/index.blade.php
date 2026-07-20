@@ -5,8 +5,8 @@
     <div class="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_20%_20%,#f59e0b_0,transparent_32%),radial-gradient(circle_at_80%_80%,#fbbf24_0,transparent_28%)]"></div>
     <div class="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-28">
         <div>
-            <span class="inline-flex rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-2 text-sm font-bold text-amber-300">Cita rasa Makassar dalam setiap gigitan</span>
-            <h1 class="mt-6 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">Kue istimewa untuk momen yang tak biasa.</h1>
+            <span class="inline-flex rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-2 text-sm font-bold text-amber-300">Cita rasa kue tradisional Makassar</span>
+            <h1 class="mt-6 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">Kue istimewa untuk tiap momen istimewa</h1>
             <p class="mt-5 max-w-xl text-lg leading-8 text-stone-300">Nikmati kue kering premium dan kue tradisional Makassar, dibuat dengan bahan pilihan dan rasa yang akrab di rumah.</p>
             <div class="mt-8 flex flex-wrap gap-3">
                 <a href="{{ route('products.index') }}" class="rounded-2xl bg-amber-500 px-6 py-3 font-black text-stone-950 hover:bg-amber-400">Belanja sekarang</a>
@@ -15,11 +15,18 @@
         </div>
         <div class="relative mx-auto w-full max-w-lg">
             <div class="aspect-square rounded-[3rem] bg-gradient-to-br from-amber-300 to-orange-600 p-4 shadow-2xl shadow-amber-900/30 rotate-2">
-                <div class="grid h-full place-items-center rounded-[2.5rem] bg-amber-50 text-[10rem] -rotate-2">🍪</div>
+                <div class="grid h-full place-items-center rounded-[2.5rem] bg-amber-50 text-[10rem] -rotate-2">
+                    <img
+                        src="{{ asset('images/branding/hero-kue.png') }}"
+                        alt="Aneka kue Kanrejawataa"
+                        class="h-full w-full object-cover"
+                    >
+                </div>
             </div>
         </div>
     </div>
 </section>
+
 
 <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
     <div class="text-center">

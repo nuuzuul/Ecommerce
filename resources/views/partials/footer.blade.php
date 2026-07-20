@@ -14,8 +14,8 @@
         </div>
         <div>
             <h3 class="font-bold text-white">Ikuti kami</h3>
-            <p class="mt-3 text-sm text-stone-400">Instagram: @kanrejawataa<br>WhatsApp: 08xx-xxxx-xxxx</p>
+            <p class="mt-3 text-sm text-stone-400">Instagram: kanrejawataa<br>WhatsApp: 082189641051<br>Email: kanrejawataa@gmail.com<br> Alamat: Jalan Toddopuli</p>
         </div>
     </div>
-    <div class="border-t border-stone-800 py-5 text-center text-xs text-stone-500">© {{ date('Y') }} Kanrejawataa. Dibuat dengan Laravel.</div>
+    <div class="border-t border-stone-800 py-5 text-center text-xs text-stone-500">© {{ date('Y') }} Kanrejawataa.</div>
 </footer>

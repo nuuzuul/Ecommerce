@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Kanrejawataa') }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/branding/favicon.svg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-100 text-stone-800 antialiased">
