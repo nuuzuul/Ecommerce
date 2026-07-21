@@ -19,13 +19,22 @@ class DashboardController extends Controller
             'products' => Product::count(),
             'customers' => User::whereHas('role', fn ($query) => $query->where('name', 'pembeli'))->count(),
             'orders' => Order::count(),
+            'cancelled_orders' => Order::where(
+                'status',
+                'dibatalkan'
+            )->count(),
             'revenue' => (float) Order::where('payment_status', 'sudah_bayar')->sum('total'),
             'waiting_payments' => Order::where('payment_status', 'menunggu_verifikasi')->count(),
             'low_stock' => ProductVariant::where('stock', '<=', 5)->count(),
         ];
 
         $topProducts = OrderItem::query()
-            ->whereHas('order', fn ($query) => $query->where('payment_status', 'sudah_bayar'))
+            ->whereHas(
+                'order',
+                fn ($query) => $query
+                    ->where('payment_status', 'sudah_bayar')
+                    ->where('status', '!=', 'dibatalkan')
+            )
             ->select('product_name', DB::raw('SUM(quantity) as quantity_sold'), DB::raw('SUM(subtotal) as sales'))
             ->groupBy('product_name')
             ->orderByDesc('quantity_sold')

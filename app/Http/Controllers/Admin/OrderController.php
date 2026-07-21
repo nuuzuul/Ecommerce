@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -19,7 +20,7 @@ class OrderController extends Controller
             'search' => ['nullable', 'string', 'max:100'],
             'status' => [
                 'nullable',
-                'in:diproses,siap_diambil,dikirim,selesai',
+                'in:diproses,siap_diambil,dikirim,selesai,dibatalkan',
             ],
             'payment_status' => [
                 'nullable',
@@ -75,19 +76,54 @@ class OrderController extends Controller
         UpdateOrderStatusRequest $request,
         Order $order
     ): RedirectResponse {
-        $order->update([
-            'status' => $request->input('status'),
-        ]);
+        $newStatus = $request->input('status');
+        $oldStatus = $order->status;
 
-        $order->histories()->create([
-            'changed_by' => $request->user()->id,
-            'status' => $request->input('status'),
-            'note' => $request->input('note'),
-        ]);
+        DB::transaction(function () use (
+            $request,
+            $order,
+            $newStatus,
+            $oldStatus
+        ): void {
+            if (
+                $newStatus === 'dibatalkan'
+                && $oldStatus !== 'dibatalkan'
+            ) {
+                $order->load('items');
+
+                foreach ($order->items as $item) {
+                    if (! $item->product_variant_id) {
+                        continue;
+                    }
+
+                    $item->variant()
+                        ->lockForUpdate()
+                        ->first()
+                        ?->increment('stock', $item->quantity);
+                }
+            }
+
+            $order->update([
+                'status' => $newStatus,
+            ]);
+
+            $order->histories()->create([
+                'changed_by' => $request->user()->id,
+                'status' => $newStatus,
+                'note' => $request->input('note')
+                    ?: (
+                        $newStatus === 'dibatalkan'
+                            ? 'Pesanan dibatalkan oleh admin.'
+                            : null
+                    ),
+            ]);
+        });
 
         return back()->with(
             'success',
-            'Status pesanan berhasil diperbarui.'
+            $newStatus === 'dibatalkan'
+                ? 'Pesanan berhasil dibatalkan dan stok produk telah dikembalikan.'
+                : 'Status pesanan berhasil diperbarui.'
         );
     }
 

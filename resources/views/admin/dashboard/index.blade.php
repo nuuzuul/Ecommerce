@@ -7,6 +7,11 @@
         ['Produk',$stats['products'],''],
         ['Pelanggan',$stats['customers'],''],
         ['Total pesanan',$stats['orders'],''],
+        [
+            'Pesanan dibatalkan',
+            $stats['cancelled_orders'],
+            '',
+        ],
         ['Total penjualan','Rp '.number_format($stats['revenue'],0,',','.'),''],
         ['Menunggu verifikasi',$stats['waiting_payments'],''],
         ['Stok menipis',$stats['low_stock'],''],

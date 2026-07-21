@@ -15,7 +15,10 @@ class CustomerOrderController extends Controller
     public function index(Request $request): View
     {
         $status = $request->validate([
-            'status' => ['nullable', 'in:diproses,siap_diambil,dikirim,selesai'],
+            'status' => [
+                'nullable',
+                'in:diproses,siap_diambil,dikirim,selesai,dibatalkan',
+            ],
         ])['status'] ?? null;
 
         $orders = $request->user()
@@ -28,7 +31,10 @@ class CustomerOrderController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('orders.index', compact('orders', 'status'));
+        return view(
+            'orders.index',
+            compact('orders', 'status')
+        );
     }
 
     public function show(Request $request, Order $order): View

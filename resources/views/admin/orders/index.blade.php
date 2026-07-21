@@ -17,7 +17,7 @@
 
         <select name="status" class="form-input">
             <option value="">Semua status</option>
-            @foreach (['diproses', 'siap_diambil', 'dikirim', 'selesai'] as $status)
+            @foreach (['diproses', 'siap_diambil', 'dikirim', 'selesai', 'dibatalkan'] as $status)
                 <option value="{{ $status }}" @selected(request('status') === $status)>
                     {{ ucwords(str_replace('_', ' ', $status)) }}
                 </option>

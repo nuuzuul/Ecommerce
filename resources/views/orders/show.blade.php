@@ -60,7 +60,31 @@
                 </a>
             @endif
 
-            @if ($order->payment_status !== 'sudah_bayar')
+            @if ($order->status === 'dibatalkan')
+                <div class="mt-5 rounded-2xl border border-red-200 bg-red-50 p-5">
+                    <div class="flex items-start gap-3">
+                        <div class="mt-0.5 text-red-600">
+                            <x-icon name="info" />
+                        </div>
+
+                        <div>
+                            <p class="font-bold text-red-700">
+                                Pesanan dibatalkan
+                            </p>
+
+                            <p class="mt-1 text-sm leading-6 text-red-600">
+                                Pesanan ini telah dibatalkan. Pembayaran dan unggah
+                                bukti pembayaran sudah tidak tersedia.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if (
+                    $order->status !== 'dibatalkan'
+                    && $order->payment_status !== 'sudah_bayar'
+                )
                 <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-5">
                     @if ($order->payment_method === 'bank_transfer')
                         <p class="text-sm text-stone-600">
@@ -85,7 +109,7 @@
                             >
                         @endif
                     @endif
-
+                    
                     @if ($order->payment_note)
                         <x-alert type="error" class="mt-4">
                             Catatan admin: {{ $order->payment_note }}

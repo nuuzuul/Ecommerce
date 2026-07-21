@@ -1,12 +1,13 @@
 @extends('layouts.account')
 @section('title','Akun Saya — Kanrejawataa')
 @section('account-content')
-<div class="space-y-6"><section class="rounded-3xl bg-stone-950 p-7 text-white"><p class="text-sm font-bold text-amber-400">Selamat datang kembali</p><h1 class="mt-2 text-3xl font-black">{{ auth()->user()->name }}</h1><p class="mt-2 text-stone-300">Kelola profil, keranjang, pembayaran, dan status pesananmu.</p></section><section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+<div class="space-y-6"><section class="rounded-3xl bg-stone-950 p-7 text-white"><p class="text-sm font-bold text-amber-400">Selamat datang kembali</p><h1 class="mt-2 text-3xl font-black">{{ auth()->user()->name }}</h1><p class="mt-2 text-stone-300">Kelola profil, keranjang, pembayaran, dan status pesananmu.</p></section><section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
     @foreach ([
         'diproses' => 'Diproses',
         'siap_diambil' => 'Siap diambil',
         'dikirim' => 'Dikirim',
         'selesai' => 'Selesai',
+        'dibatalkan' => 'Dibatalkan',
     ] as $key => $label)
 
         <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
@@ -14,7 +15,13 @@
                 {{ $label }}
             </p>
 
-            <p class="mt-2 text-3xl font-black text-amber-700">
+            <p
+                @class([
+                    'mt-2 text-3xl font-black',
+                    'text-red-600' => $key === 'dibatalkan',
+                    'text-amber-700' => $key !== 'dibatalkan',
+                ])
+            >
                 {{ (int) ($orderSummary[$key] ?? 0) }}
             </p>
         </div>

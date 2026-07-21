@@ -173,43 +173,98 @@
                 </section>
 
                 <section class="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
-                    <h3 class="text-xl font-black">Perbarui status</h3>
+                    <h3 class="text-xl font-black">
+                        Perbarui status
+                    </h3>
 
-                    <form
-                        method="POST"
-                        action="{{ route('admin.orders.status', $order) }}"
-                        class="mt-4 space-y-3"
-                    >
-                        @csrf
-                        @method('PATCH')
+                    @if ($order->status === 'dibatalkan')
+                        <div class="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="mt-0.5 text-red-600">
+                                    <x-icon name="info" />
+                                </div>
 
-                        <select name="status" class="form-input">
-                            @foreach (
-                                $order->delivery_method === 'pickup'
-                                    ? ['diproses', 'siap_diambil', 'selesai']
-                                    : ['diproses', 'dikirim', 'selesai']
-                                as $status
-                            )
-                                <option
-                                    value="{{ $status }}"
-                                    @selected($order->status === $status)
-                                >
-                                    {{ ucwords(str_replace('_', ' ', $status)) }}
-                                </option>
-                            @endforeach
-                        </select>
+                                <div>
+                                    <p class="font-bold text-red-700">
+                                        Pesanan dibatalkan
+                                    </p>
 
-                        <textarea
-                            name="note"
-                            rows="3"
-                            class="form-input"
-                            placeholder="Catatan tracking (opsional)"
-                        ></textarea>
+                                    <p class="mt-1 text-sm text-red-600">
+                                        Pesanan ini sudah dibatalkan dan statusnya tidak
+                                        dapat diubah kembali.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif ($order->status === 'selesai')
+                        <div class="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                            <p class="font-bold text-emerald-700">
+                                Pesanan sudah selesai.
+                            </p>
+                        </div>
+                    @else
+                        <form
+                            method="POST"
+                            action="{{ route('admin.orders.status', $order) }}"
+                            class="mt-4 space-y-3"
+                        >
+                            @csrf
+                            @method('PATCH')
 
-                        <button class="btn-primary w-full">
-                            Simpan status
-                        </button>
-                    </form>
+                            <select
+                                name="status"
+                                class="form-input"
+                            >
+                                @php
+                                    $availableStatuses = $order->delivery_method === 'pickup'
+                                        ? [
+                                            'diproses',
+                                            'siap_diambil',
+                                            'selesai',
+                                            'dibatalkan',
+                                        ]
+                                        : [
+                                            'diproses',
+                                            'dikirim',
+                                            'selesai',
+                                            'dibatalkan',
+                                        ];
+                                @endphp
+
+                                @foreach ($availableStatuses as $status)
+                                    <option
+                                        value="{{ $status }}"
+                                        @selected($order->status === $status)
+                                    >
+                                        {{ ucwords(str_replace('_', ' ', $status)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            @error('status')
+                                <p class="form-error">
+                                    {{ $message }}
+                                </p>
+                            @enderror
+
+                            <textarea
+                                name="note"
+                                rows="3"
+                                class="form-input"
+                                placeholder="Catatan tracking atau alasan pembatalan"
+                            >{{ old('note') }}</textarea>
+
+                            @error('note')
+                                <p class="form-error">
+                                    {{ $message }}
+                                </p>
+                            @enderror
+
+                            <button class="btn-primary w-full">
+                                Simpan status
+                            </button>
+                        </form>
+                    @endif
                 </section>
             </aside>
         </div>
