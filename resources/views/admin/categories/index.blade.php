@@ -61,23 +61,82 @@
                                         <x-icon name="edit" />
                                     </a>
 
-                                    <form
-                                        method="POST"
-                                        action="{{ route('admin.categories.destroy', $category) }}"
-                                        onsubmit="return confirm('Hapus kategori ini?')"
+                                    <div
+                                        x-data="{ openDelete: false }"
+                                        class="inline-flex"
                                     >
-                                        @csrf
-                                        @method('DELETE')
-
                                         <button
-                                            type="submit"
+                                            type="button"
+                                            x-on:click="openDelete = true"
                                             class="icon-action icon-action-delete"
                                             title="Hapus kategori"
                                             aria-label="Hapus kategori"
                                         >
                                             <x-icon name="trash" />
                                         </button>
-                                    </form>
+
+                                        <div
+                                            x-cloak
+                                            x-show="openDelete"
+                                            x-transition.opacity
+                                            x-on:keydown.escape.window="openDelete = false"
+                                            class="fixed inset-0 z-50 flex items-center justify-center px-4"
+                                        >
+                                            <div
+                                                class="absolute inset-0 bg-stone-950/60"
+                                                x-on:click="openDelete = false"
+                                            ></div>
+
+                                            <div
+                                                x-show="openDelete"
+                                                x-transition
+                                                class="relative z-10 w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
+                                            >
+                                                <div class="flex items-start gap-4">
+                                                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+                                                        <x-icon name="trash" />
+                                                    </div>
+
+                                                    <div>
+                                                        <h2 class="text-xl font-black text-stone-900">
+                                                            Hapus kategori?
+                                                        </h2>
+
+                                                        <p class="mt-2 text-sm leading-6 text-stone-600">
+                                                            Kategori
+                                                            <strong>{{ $category->name }}</strong>
+                                                            akan dihapus. Tindakan ini tidak dapat dibatalkan.
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-6 flex justify-end gap-3">
+                                                    <button
+                                                        type="button"
+                                                        x-on:click="openDelete = false"
+                                                        class="rounded-xl border border-stone-300 px-4 py-2.5 font-bold text-stone-700 transition hover:bg-stone-100"
+                                                    >
+                                                        Batal
+                                                    </button>
+
+                                                    <form
+                                                        method="POST"
+                                                        action="{{ route('admin.categories.destroy', $category) }}"
+                                                    >
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <button
+                                                            type="submit"
+                                                            class="rounded-xl bg-red-600 px-4 py-2.5 font-bold text-white transition hover:bg-red-700"
+                                                        >
+                                                            Ya, hapus
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
