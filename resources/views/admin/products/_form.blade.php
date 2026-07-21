@@ -1,7 +1,44 @@
 @php
-    $selectedCategoryId = (int) old('category_id', $product->category_id ?? ($categories->first()?->id));
-    $initialVariants = old('variants', isset($product) ? $product->variants->map(fn($v) => ['label'=>$v->label,'weight_grams'=>$v->weight_grams,'price'=>(float)$v->price,'stock'=>$v->stock])->values()->all() : [['label'=>'500 gram','weight_grams'=>500,'price'=>'','stock'=>''],['label'=>'1 kg','weight_grams'=>1000,'price'=>'','stock'=>'']]);
-    $categoryMap = $categories->mapWithKeys(fn($c) => [$c->id => ['uses_variants'=>$c->uses_variants]])->all();
+    $selectedCategoryId = (int) old(
+        'category_id',
+        $product->category_id ?? $categories->first()?->id
+    );
+
+    $initialVariants = old(
+        'variants',
+        isset($product)
+            ? $product->variants
+                ->map(fn ($variant) => [
+                    'label' => $variant->label,
+                    'weight_grams' => $variant->weight_grams,
+                    'price' => (float) $variant->price,
+                    'stock' => $variant->stock,
+                ])
+                ->values()
+                ->all()
+            : [
+                [
+                    'label' => '500 gram',
+                    'weight_grams' => 500,
+                    'price' => '',
+                    'stock' => '',
+                ],
+                [
+                    'label' => '1 kg',
+                    'weight_grams' => 1000,
+                    'price' => '',
+                    'stock' => '',
+                ],
+            ]
+    );
+
+    $categoryMap = $categories
+        ->mapWithKeys(fn ($category) => [
+            $category->id => [
+                'uses_variants' => $category->uses_variants,
+            ],
+        ])
+        ->all();
 @endphp
 <div x-data="productForm(@js($categoryMap), @js($selectedCategoryId), @js($initialVariants))" class="space-y-6">
     <div class="grid gap-5 md:grid-cols-2">
@@ -15,12 +52,90 @@
         <div><h3 class="text-lg font-black">Harga dan stok</h3><p class="text-sm text-stone-600" x-text="usesVariants ? 'Kue kering wajib memiliki ukuran 500 gram dan 1 kg.' : 'Kue tradisional menggunakan satu harga tanpa ukuran.'"></p></div>
         @error('variants')<p class="form-error mt-2">{{ $message }}</p>@enderror
         <div class="mt-4 space-y-3">
-            <template x-for="(variant,index) in variants" :key="index">
+            <template
+                x-for="(variant, index) in variants"
+                :key="index"
+            >
                 <div class="grid gap-3 rounded-xl bg-white p-4 sm:grid-cols-4">
-                    <div x-show="usesVariants"><label class="form-label">Ukuran</label><input :name="`variants[${index}][label]`" x-model="variant.label" class="form-input" readonly></div>
-                    <input type="hidden" :name="`variants[${index}][weight_grams]`" x-model="variant.weight_grams">
-                    <div :class="usesVariants ? 'sm:col-span-2':'sm:col-span-3'"><label class="form-label">Harga</label><input type="number" min="1000" :name="`variants[${index}][price]`" x-model="variant.price" class="form-input" placeholder="Contoh: 85000"></div>
-                    <div><label class="form-label">Stok</label><input type="number" min="0" :name="`variants[${index}][stock]`" x-model="variant.stock" class="form-input"></div>
+
+                    <template x-if="usesVariants">
+                        <div>
+                            <label class="form-label">
+                                Ukuran
+                            </label>
+
+                            <input
+                                type="text"
+                                :name="`variants[${index}][label]`"
+                                x-model="variant.label"
+                                class="form-input"
+                                readonly
+                            >
+
+                            <input
+                                type="hidden"
+                                :name="`variants[${index}][weight_grams]`"
+                                x-model="variant.weight_grams"
+                            >
+                        </div>
+                    </template>
+
+                    <template x-if="! usesVariants">
+                        <div>
+                            <label class="form-label">
+                                Berat kirim (gram)
+                            </label>
+
+                            <input
+                                type="number"
+                                min="1"
+                                max="30000"
+                                :name="`variants[${index}][weight_grams]`"
+                                x-model="variant.weight_grams"
+                                class="form-input"
+                                placeholder="Contoh: 750"
+                            >
+
+                            <input
+                                type="hidden"
+                                :name="`variants[${index}][label]`"
+                                value=""
+                            >
+
+                            <p class="mt-1 text-xs text-stone-500">
+                                Berat ini hanya digunakan untuk menghitung ongkir.
+                            </p>
+                        </div>
+                    </template>
+
+                    <div class="sm:col-span-2">
+                        <label class="form-label">
+                            Harga
+                        </label>
+
+                        <input
+                            type="number"
+                            min="1000"
+                            :name="`variants[${index}][price]`"
+                            x-model="variant.price"
+                            class="form-input"
+                            placeholder="Contoh: 85000"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="form-label">
+                            Stok
+                        </label>
+
+                        <input
+                            type="number"
+                            min="0"
+                            :name="`variants[${index}][stock]`"
+                            x-model="variant.stock"
+                            class="form-input"
+                        >
+                    </div>
                 </div>
             </template>
         </div>
@@ -33,19 +148,53 @@
     </div>
 </div>
 @once
-<script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('productForm', (categories, initialCategory, initialVariants) => ({
-        categories,
-        categoryId: initialCategory,
-        variants: initialVariants,
-        get usesVariants() { return Boolean(this.categories[this.categoryId]?.uses_variants); },
-        syncVariants() {
-            this.variants = this.usesVariants
-                ? [{label:'500 gram',weight_grams:500,price:'',stock:''},{label:'1 kg',weight_grams:1000,price:'',stock:''}]
-                : [{label:'',weight_grams:'',price:'',stock:''}];
-        },
-    }));
-});
-</script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data(
+                'productForm',
+                (
+                    categories,
+                    initialCategory,
+                    initialVariants
+                ) => ({
+                    categories,
+                    categoryId: initialCategory,
+                    variants: initialVariants,
+
+                    get usesVariants() {
+                        return Boolean(
+                            this.categories[this.categoryId]
+                                ?.uses_variants
+                        );
+                    },
+
+                    syncVariants() {
+                        this.variants = this.usesVariants
+                            ? [
+                                {
+                                    label: '500 gram',
+                                    weight_grams: 500,
+                                    price: '',
+                                    stock: '',
+                                },
+                                {
+                                    label: '1 kg',
+                                    weight_grams: 1000,
+                                    price: '',
+                                    stock: '',
+                                },
+                            ]
+                            : [
+                                {
+                                    label: '',
+                                    weight_grams: '',
+                                    price: '',
+                                    stock: '',
+                                },
+                            ];
+                    },
+                })
+            );
+        });
+    </script>
 @endonce

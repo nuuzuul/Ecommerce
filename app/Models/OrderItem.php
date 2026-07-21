@@ -16,14 +16,20 @@ class OrderItem extends Model
         'product_variant_id',
         'product_name',
         'variant_label',
+        'unit_weight_grams',
         'price',
         'quantity',
+        'total_weight_grams',
         'subtotal',
     ];
 
     protected function casts(): array
     {
         return [
+            'unit_weight_grams' => 'integer',
+            'quantity' => 'integer',
+            'total_weight_grams' => 'integer',
+
             'price' => 'decimal:2',
             'subtotal' => 'decimal:2',
         ];

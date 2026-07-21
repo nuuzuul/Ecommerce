@@ -152,26 +152,184 @@
                         </div>
                     </dl>
 
-                    <div class="mt-5 space-y-2 text-sm text-stone-300">
+                    <div class="mt-5 space-y-3 text-sm text-stone-300">
                         <p>
-                            <b class="text-white">Metode:</b>
+                            <b class="text-white">
+                                Metode pengantaran:
+                            </b>
+
                             {{ $order->delivery_label }}
                         </p>
 
-                        @if ($order->shipping_address)
+                        <p class="break-words">
+                            <b class="text-white">
+                                Penerima:
+                            </b>
+
+                            {{ $order->recipient_name }}
+                            ·
+                            {{ $order->recipient_phone }}
+                        </p>
+
+                        @if ($order->delivery_method === 'delivery')
+                            <p>
+                                <b class="text-white">
+                                    Kurir:
+                                </b>
+
+                                {{ $order->shipping_service_label }}
+                            </p>
+
+                            @if ($order->courier_name)
+                                <p>
+                                    <b class="text-white">
+                                        Perusahaan kurir:
+                                    </b>
+
+                                    {{ $order->courier_name }}
+                                </p>
+                            @endif
+
+                            @if ($order->courier_description)
+                                <p>
+                                    <b class="text-white">
+                                        Layanan:
+                                    </b>
+
+                                    {{ $order->courier_description }}
+                                </p>
+                            @endif
+
+                            <p>
+                                <b class="text-white">
+                                    Berat paket:
+                                </b>
+
+                                {{ $order->formatted_weight }}
+                            </p>
+
+                            <p>
+                                <b class="text-white">
+                                    Estimasi:
+                                </b>
+
+                                {{ $order->shipping_etd ?: 'Tidak tersedia' }}
+                            </p>
+
                             <p class="break-words">
-                                <b class="text-white">Alamat:</b>
-                                {{ $order->shipping_address }}
+                                <b class="text-white">
+                                    Tujuan RajaOngkir:
+                                </b>
+
+                                {{ $order->destination_address ?: '-' }}
+                            </p>
+
+                            <p class="break-words">
+                                <b class="text-white">
+                                    Alamat lengkap:
+                                </b>
+
+                                {{ $order->shipping_address ?: '-' }}
                             </p>
                         @else
                             <p class="break-words">
-                                <b class="text-white">Lokasi ambil:</b>
+                                <b class="text-white">
+                                    Lokasi pengambilan:
+                                </b>
+
                                 {{ config('kanrejawataa.pickup_address') }}
                             </p>
                         @endif
                     </div>
                 </section>
 
+                <section class="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-xl font-black">
+                        Informasi pengiriman
+                    </h3>
+
+                    @if ($order->delivery_method === 'delivery')
+                        <dl class="mt-5 space-y-4 text-sm">
+                            <div>
+                                <dt class="text-stone-500">
+                                    Lokasi tujuan
+                                </dt>
+
+                                <dd class="mt-1 font-bold text-stone-900">
+                                    {{ $order->destination_address ?: '-' }}
+                                </dd>
+                            </div>
+
+                            <div>
+                                <dt class="text-stone-500">
+                                    Alamat lengkap
+                                </dt>
+
+                                <dd class="mt-1 font-bold text-stone-900">
+                                    {{ $order->shipping_address ?: '-' }}
+                                </dd>
+                            </div>
+
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                    <dt class="text-stone-500">
+                                        Kurir dan layanan
+                                    </dt>
+
+                                    <dd class="mt-1 font-bold text-stone-900">
+                                        {{ $order->shipping_service_label }}
+                                    </dd>
+                                </div>
+
+                                <div>
+                                    <dt class="text-stone-500">
+                                        Estimasi
+                                    </dt>
+
+                                    <dd class="mt-1 font-bold text-stone-900">
+                                        {{ $order->shipping_etd ?: 'Tidak tersedia' }}
+                                    </dd>
+                                </div>
+
+                                <div>
+                                    <dt class="text-stone-500">
+                                        Berat paket
+                                    </dt>
+
+                                    <dd class="mt-1 font-bold text-stone-900">
+                                        {{ $order->formatted_weight }}
+                                    </dd>
+                                </div>
+
+                                <div>
+                                    <dt class="text-stone-500">
+                                        Ongkos kirim
+                                    </dt>
+
+                                    <dd class="mt-1 font-bold text-amber-700">
+                                        Rp {{ number_format(
+                                            $order->shipping_cost,
+                                            0,
+                                            ',',
+                                            '.'
+                                        ) }}
+                                    </dd>
+                                </div>
+                            </div>
+                        </dl>
+                    @else
+                        <div class="mt-4 rounded-2xl bg-amber-50 p-4">
+                            <p class="font-bold text-amber-800">
+                                Pesanan diambil sendiri
+                            </p>
+
+                            <p class="mt-1 text-sm text-stone-600">
+                                {{ config('kanrejawataa.pickup_address') }}
+                            </p>
+                        </div>
+                    @endif
+                </section>
+                
                 <section class="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm">
                     <h3 class="text-xl font-black">
                         Perbarui status

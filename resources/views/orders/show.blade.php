@@ -180,6 +180,28 @@
                                     {{ $item->quantity }} ×
                                     Rp {{ number_format($item->price, 0, ',', '.') }}
                                 </p>
+                                @if ((int) $item->unit_weight_grams > 0)
+                                    <p class="mt-1 text-xs text-stone-500">
+                                        Berat:
+                                        {{ number_format(
+                                            $item->unit_weight_grams,
+                                            0,
+                                            ',',
+                                            '.'
+                                        ) }}
+                                        gram × {{ $item->quantity }}
+
+                                        =
+
+                                        {{ number_format(
+                                            $item->total_weight_grams,
+                                            0,
+                                            ',',
+                                            '.'
+                                        ) }}
+                                        gram
+                                    </p>
+                                @endif
                             </div>
 
                             <b class="shrink-0">
@@ -208,19 +230,72 @@
                     </div>
                 </dl>
 
-                <div class="mt-5 space-y-2 text-sm text-stone-300">
+                <div class="mt-5 space-y-3 text-sm text-stone-300">
                     <p>
-                        <b class="text-white">Pengantaran:</b>
+                        <b class="text-white">
+                            Metode pengantaran:
+                        </b>
+
                         {{ $order->delivery_label }}
                     </p>
+
                     <p class="break-words">
-                        <b class="text-white">Penerima:</b>
-                        {{ $order->recipient_name }} · {{ $order->recipient_phone }}
+                        <b class="text-white">
+                            Penerima:
+                        </b>
+
+                        {{ $order->recipient_name }}
+                        ·
+                        {{ $order->recipient_phone }}
                     </p>
-                    @if ($order->shipping_address)
+
+                    @if ($order->delivery_method === 'delivery')
+                        <p>
+                            <b class="text-white">
+                                Kurir:
+                            </b>
+
+                            {{ $order->shipping_service_label }}
+                        </p>
+
+                        <p>
+                            <b class="text-white">
+                                Berat paket:
+                            </b>
+
+                            {{ $order->formatted_weight }}
+                        </p>
+
+                        <p>
+                            <b class="text-white">
+                                Estimasi:
+                            </b>
+
+                            {{ $order->shipping_etd ?: 'Tidak tersedia' }}
+                        </p>
+
                         <p class="break-words">
-                            <b class="text-white">Alamat:</b>
-                            {{ $order->shipping_address }}
+                            <b class="text-white">
+                                Tujuan:
+                            </b>
+
+                            {{ $order->destination_address ?: '-' }}
+                        </p>
+
+                        <p class="break-words">
+                            <b class="text-white">
+                                Alamat lengkap:
+                            </b>
+
+                            {{ $order->shipping_address ?: '-' }}
+                        </p>
+                    @else
+                        <p class="break-words">
+                            <b class="text-white">
+                                Lokasi pengambilan:
+                            </b>
+
+                            {{ config('kanrejawataa.pickup_address') }}
                         </p>
                     @endif
                 </div>

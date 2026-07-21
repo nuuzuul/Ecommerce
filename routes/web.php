@@ -12,7 +12,12 @@ use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShippingController;
 use Illuminate\Support\Facades\Route;
+
+/*
+| Halaman publik
+*/
 
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
@@ -23,8 +28,10 @@ Route::get('/produk', [CatalogController::class, 'index'])
 Route::get('/produk/{product}', [CatalogController::class, 'show'])
     ->name('products.show');
 
-Route::get('/kategori/{category}', [CatalogController::class, 'category'])
-    ->name('categories.show');
+Route::get(
+    '/kategori/{category}',
+    [CatalogController::class, 'category']
+)->name('categories.show');
 
 Route::view('/tentang', 'static.about')
     ->name('about');
@@ -32,37 +39,94 @@ Route::view('/tentang', 'static.about')
 Route::view('/kontak', 'static.contact')
     ->name('contact');
 
+/*
+| Pengarah dashboard
+*/
+
 Route::get('/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
 
-Route::middleware(['auth', 'role:pembeli'])->group(function () {
+/*
+| Halaman pembeli
+*/
+
+Route::middleware([
+    'auth',
+    'role:pembeli',
+])->group(function () {
     Route::get('/akun', AccountDashboardController::class)
         ->name('account.dashboard');
 
-    Route::get('/keranjang', [CartController::class, 'index'])
-        ->name('cart.index');
+    /*
+    | Keranjang
+    */
 
-    Route::post('/keranjang', [CartController::class, 'store'])
-        ->name('cart.store');
+    Route::get(
+        '/keranjang',
+        [CartController::class, 'index']
+    )->name('cart.index');
 
-    Route::patch('/keranjang/{cartItem}', [CartController::class, 'update'])
-        ->name('cart.update');
+    Route::post(
+        '/keranjang',
+        [CartController::class, 'store']
+    )->name('cart.store');
 
-    Route::delete('/keranjang/{cartItem}', [CartController::class, 'destroy'])
-        ->name('cart.destroy');
+    Route::patch(
+        '/keranjang/{cartItem}',
+        [CartController::class, 'update']
+    )->name('cart.update');
 
-    Route::get('/checkout', [CheckoutController::class, 'create'])
-        ->name('checkout.create');
+    Route::delete(
+        '/keranjang/{cartItem}',
+        [CartController::class, 'destroy']
+    )->name('cart.destroy');
 
-    Route::post('/checkout', [CheckoutController::class, 'store'])
-        ->name('checkout.store');
+    /*
+    | RajaOngkir
+    */
 
-    Route::get('/pesanan', [CustomerOrderController::class, 'index'])
-        ->name('orders.index');
+    Route::get(
+        '/pengiriman/tujuan',
+        [ShippingController::class, 'searchDestinations']
+    )
+        ->middleware('throttle:30,1')
+        ->name('shipping.destinations');
 
-    Route::get('/pesanan/{order}', [CustomerOrderController::class, 'show'])
-        ->name('orders.show');
+    Route::post(
+        '/pengiriman/ongkir',
+        [ShippingController::class, 'calculateCosts']
+    )
+        ->middleware('throttle:20,1')
+        ->name('shipping.costs');
+
+    /*
+    | Checkout
+    */
+
+    Route::get(
+        '/checkout',
+        [CheckoutController::class, 'create']
+    )->name('checkout.create');
+
+    Route::post(
+        '/checkout',
+        [CheckoutController::class, 'store']
+    )->name('checkout.store');
+
+    /*
+    | Pesanan pembeli
+    */
+
+    Route::get(
+        '/pesanan',
+        [CustomerOrderController::class, 'index']
+    )->name('orders.index');
+
+    Route::get(
+        '/pesanan/{order}',
+        [CustomerOrderController::class, 'show']
+    )->name('orders.show');
 
     Route::post(
         '/pesanan/{order}/bukti-pembayaran',
@@ -70,23 +134,39 @@ Route::middleware(['auth', 'role:pembeli'])->group(function () {
     )->name('orders.payment-proof');
 });
 
+/*
+| Panel admin
+*/
+
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'role:admin'])
+    ->middleware([
+        'auth',
+        'role:admin',
+    ])
     ->group(function () {
         Route::get('/', AdminDashboardController::class)
             ->name('dashboard');
 
-        Route::resource('categories', AdminCategoryController::class)
-            ->except('show');
+        Route::resource(
+            'categories',
+            AdminCategoryController::class
+        )->except('show');
 
-        Route::resource('products', AdminProductController::class);
+        Route::resource(
+            'products',
+            AdminProductController::class
+        );
 
-        Route::get('orders', [AdminOrderController::class, 'index'])
-            ->name('orders.index');
+        Route::get(
+            'orders',
+            [AdminOrderController::class, 'index']
+        )->name('orders.index');
 
-        Route::get('orders/{order}', [AdminOrderController::class, 'show'])
-            ->name('orders.show');
+        Route::get(
+            'orders/{order}',
+            [AdminOrderController::class, 'show']
+        )->name('orders.show');
 
         Route::patch(
             'orders/{order}/status',
@@ -104,17 +184,29 @@ Route::prefix('admin')
         )->name('orders.reject-payment');
     });
 
+/*
+| Halaman yang dapat diakses pengguna terautentikasi
+*/
+
 Route::middleware('auth')->group(function () {
     Route::get(
         '/pesanan/{order}/bukti-pembayaran',
         [CustomerOrderController::class, 'paymentProof']
     )->name('orders.payment-proof.show');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])
-        ->name('profile.edit');
+    Route::get(
+        '/profile',
+        [ProfileController::class, 'edit']
+    )->name('profile.edit');
 
-    Route::patch('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
+    Route::patch(
+        '/profile',
+        [ProfileController::class, 'update']
+    )->name('profile.update');
 });
+
+/*
+| Route autentikasi Breeze
+*/
 
 require __DIR__ . '/auth.php';

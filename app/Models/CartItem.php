@@ -30,4 +30,11 @@ class CartItem extends Model
     {
         return (float) $this->variant->price * $this->quantity;
     }
+
+    public function getTotalWeightGramsAttribute(): int
+    {
+        $unitWeight = (int) ($this->variant?->weight_grams ?? 0);
+
+        return $unitWeight * (int) $this->quantity;
+    }
 }

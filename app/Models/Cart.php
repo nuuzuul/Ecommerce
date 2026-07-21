@@ -27,4 +27,12 @@ class Cart extends Model
     {
         return (float) $this->items->sum(fn (CartItem $item) => $item->subtotal);
     }
+    
+    public function getTotalWeightGramsAttribute(): int
+    {
+        return (int) $this->items->sum(
+            fn (CartItem $item) =>
+                $item->total_weight_grams
+        );
+    }
 }
