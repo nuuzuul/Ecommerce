@@ -4,12 +4,12 @@
 @section('content')
 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
     @foreach([
-        ['Produk',$stats['products'],'🍪'],
-        ['Pelanggan',$stats['customers'],'👥'],
-        ['Total pesanan',$stats['orders'],'🧾'],
-        ['Total penjualan','Rp '.number_format($stats['revenue'],0,',','.'),'💰'],
-        ['Menunggu verifikasi',$stats['waiting_payments'],'⏳'],
-        ['Stok menipis',$stats['low_stock'],'⚠️'],
+        ['Produk',$stats['products'],''],
+        ['Pelanggan',$stats['customers'],''],
+        ['Total pesanan',$stats['orders'],''],
+        ['Total penjualan','Rp '.number_format($stats['revenue'],0,',','.'),''],
+        ['Menunggu verifikasi',$stats['waiting_payments'],''],
+        ['Stok menipis',$stats['low_stock'],''],
     ] as [$label,$value,$icon])
         <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"><div class="flex items-start justify-between"><div><p class="text-sm text-stone-500">{{ $label }}</p><p class="mt-2 text-2xl font-black text-stone-900">{{ $value }}</p></div><span class="text-3xl">{{ $icon }}</span></div></div>
     @endforeach
